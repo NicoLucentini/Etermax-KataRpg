@@ -7,7 +7,15 @@ namespace Actions
     {
         public void Execute(Character actor, Character target)
         {
-            var damage = actor.DamageAmount;
+            if (actor.Id == target.Id) return;
+
+            float attackCoef = 1;
+            if (target.Level - actor.Level >= 5)
+                attackCoef = 0.5f;
+            else if (actor.Level - target.Level >= 5)
+                attackCoef = 1.5f;
+
+            var damage = (int)(actor.DamageAmount * attackCoef);
             target.Health -= Math.Min(damage, target.Health);
             if (target.Health <= 0)
             {

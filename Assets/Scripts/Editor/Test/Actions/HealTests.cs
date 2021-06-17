@@ -52,5 +52,27 @@ namespace Editor.Test.Actions
             Assert.IsFalse(_target.Alive);
         }
 
+        //Iteration 2
+        //It Changes test of a character can heal
+        [Test]
+        public void CharacterCantHealOtherCharacter()
+        {
+            _target = new Character("Target", Character.MAX_HEALTH - _actor.HealAmount);
+
+            _heal.Execute(_actor, _target);
+
+            Assert.AreNotEqual(Character.MAX_HEALTH, _target.Health);
+        }
+        [Test]
+        public void CharacterCanHealHimself()
+        {
+            int initialHealth = 100;
+            _actor = new Character("Actor", initialHealth);
+
+            _heal.Execute(_actor, _actor);
+
+            Assert.AreEqual(initialHealth + _actor.HealAmount, _actor.Health);
+        }
+
     }
 }
