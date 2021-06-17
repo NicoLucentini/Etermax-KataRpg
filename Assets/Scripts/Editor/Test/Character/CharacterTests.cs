@@ -21,6 +21,20 @@ namespace Editor.Test.Actions
             Assert.True(actor.Alive);
         }
 
-        
+        //Iteration3
+        [Test]
+        public void MeleeFighterRangeCorrect()
+        {
+            MeleeFighter actor = new MeleeFighter("Actor");
+
+            Assert.AreEqual(2, actor.Range);
+        }
+        [Test]
+        public void RangeFighterCorrect()
+        {
+            RangeFighter actor = new RangeFighter("Actor");
+
+            Assert.AreEqual(20, actor.Range);
+        }
     }
 }

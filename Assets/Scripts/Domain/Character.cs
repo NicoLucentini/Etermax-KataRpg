@@ -13,6 +13,8 @@ namespace com.rpg.domain
         public int DamageAmount = 10;
         public int HealAmount = 10;
         
+        public int Range { get; protected set; }
+
         public Character(string id, int health = MAX_HEALTH, int level = 1)
         {
             Id = id;
