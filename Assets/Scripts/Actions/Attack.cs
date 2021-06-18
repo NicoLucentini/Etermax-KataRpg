@@ -8,6 +8,7 @@ namespace Actions
         public void Execute(Character actor, Character target)
         {
             if (actor.Id == target.Id) return;
+            if (actor.IsAlly(target)) return;
 
             float attackCoef = 1;
             if (target.Level - actor.Level >= 5)

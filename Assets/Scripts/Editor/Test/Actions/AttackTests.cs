@@ -78,5 +78,18 @@ namespace Editor.Test.Actions
             _attack.Execute(_actor, _target);
             Assert.AreEqual(1000 - (int)(_actor.DamageAmount * 1.5f), _target.Health);
         }
+
+        //Iteration4
+
+        [Test]
+        public void AlliesCantDealDamageBetweenThem() {
+            _actor.JoinFaction("Alliance");
+            _target = new Character("Target");
+            _target.JoinFaction("Alliance");
+
+            _attack.Execute(_actor, _target);
+            Assert.AreEqual(Character.MAX_HEALTH, _target.Health);
+
+        }
     }
 }

@@ -12,8 +12,19 @@ public class ActionsView : MonoBehaviour, IActionsView
     [SerializeField] private Button _heal;
     [SerializeField] private TMP_InputField _actor;
     [SerializeField] private TMP_InputField _target;
+
+    [SerializeField] private TMP_InputField _distance;
+
     [SerializeField] private List<CharacterView> _characterViews;
     private CharactersActionsPresenter _presenter;
+    public static System.Action<int> onChangeIteration;
+
+    [SerializeField]private Dropdown _iterationsDropdown;
+
+    void Awake() {
+        var iterations = new List<string>(){ "Iteration 1", "Iteration2", "Iteration3", "Iteration4" };
+        _iterationsDropdown.AddOptions(iterations);
+    }
 
     private void Start()
     {
@@ -37,6 +48,13 @@ public class ActionsView : MonoBehaviour, IActionsView
     {
         Debug.LogFormat("Char {0} Attacking char {1}", GetActorName(), GetTargetName());
         _presenter.Attack(GetActorName(), GetTargetName());
+    }
+
+    public void OnChangeIteration(int iteration) {
+
+        _distance.transform.parent.gameObject.SetActive(iteration > 1);
+        onChangeIteration?.Invoke(iteration);
+        _presenter = new CharactersActionsPresenter(_characterViews.Select(view => view.Character).ToList(), new Attack(), new Heal(), this);
     }
 
     private string GetActorName()

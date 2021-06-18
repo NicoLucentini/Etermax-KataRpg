@@ -7,10 +7,11 @@ namespace Actions
     {
         public void Execute(Character actor, Character target)
         {
-            if (actor.Id != target.Id)
-                return;
             if (!target.Alive)
                 return;
+            
+            
+            if (actor != target && !actor.IsAlly(target)) return;
 
             var healing = actor.HealAmount;
             target.Health += Math.Min(healing, target.HealthToMax());

@@ -69,10 +69,23 @@ namespace Editor.Test.Actions
         {
             int initialHealth = 100;
             _actor = new Character("Actor", initialHealth);
-
             _heal.Execute(_actor, _actor);
 
             Assert.AreEqual(initialHealth + _actor.HealAmount, _actor.Health);
+        }
+
+        //Iteration 4
+
+        [Test]
+        public void CharacterCanHealAllies() {
+
+            _actor.JoinFaction("Alliance");
+            _target = new Character("Target", Character.MAX_HEALTH - _actor.HealAmount);
+            _target.JoinFaction("Alliance");
+
+            _heal.Execute(_actor, _target);
+
+            Assert.AreEqual(Character.MAX_HEALTH, _target.Health);
         }
 
     }
