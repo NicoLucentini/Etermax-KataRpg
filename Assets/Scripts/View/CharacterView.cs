@@ -33,11 +33,12 @@ public class CharacterView : MonoBehaviour
     public void SetCharacter(Character character)
     {
         Character = character;
+        UpdateView();
     }
 
     public void UpdateView()
     {
-        _nameText.text = _name;
+        _nameText.text = Character.Id.ToString();
         _healthText.text = Character.Health.ToString();
         _levelText.text = Character.Level.ToString();
         _aliveText.text = Character.Alive.ToString();

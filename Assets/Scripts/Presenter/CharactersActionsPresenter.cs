@@ -20,6 +20,7 @@ namespace Presenter
             
             _view.UpdateCharactersView();
         }
+      
 
         public void Attack(string actor, string target)
         {
@@ -36,7 +37,15 @@ namespace Presenter
             _heal.Execute(characterActor, characterTarget);
             _view.UpdateCharactersView();
         }
+        public void CreateCharacter(CharacterData data) {
+            Character character;
+            if (data.isRanged)
+                character = new RangeFighter(data.name, data.health, data.level);
+            else
+                character = new MeleeFighter(data.name, data.health, data.level);
 
+            _view.OnCharacterCreated(character);
+        }
         private Character GetCharacter(string actor)
         {
             return _characters.Find(c => c.Id == actor);
