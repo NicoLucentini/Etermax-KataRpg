@@ -45,5 +45,9 @@ public class CharacterView : MonoBehaviour
         _rangeText.text = Character.Range.ToString();
         _factionsText.text = Character.FactionsToString();
     }
-   
+
+    private void OnDestroy()
+    {
+        ActionsView.onChangeIteration -= OnChangeIteration;
+    }
 }

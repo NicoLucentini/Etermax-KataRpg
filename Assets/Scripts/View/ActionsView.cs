@@ -23,31 +23,38 @@ public class ActionsView : MonoBehaviour, IActionsView
     [SerializeField]private Dropdown _iterationsDropdown;
 
     [SerializeField] private Transform _charactersViewParent;
- 
+
+    [SerializeField]private  IterationData[] iterationData;
+
     [Header("Character Creation")]
+    [SerializeField] private GameObject _characterViewPrefab;
     [SerializeField] private Button _createCharacter;
     [SerializeField] private TMP_InputField _characterName;
     [SerializeField] private TMP_InputField _characterHealth;
     [SerializeField] private TMP_InputField _characterLevel;
     [SerializeField] private Toggle _characterRanged;
 
+    [Header("Character Factions")]
     [SerializeField] private Button _joinFactionBtn;
     [SerializeField] private TMP_InputField _faction;
     [SerializeField] private Button _leaveFactionBtn;
 
-    [SerializeField] private GameObject _characterViewPrefab;
-
     void Awake() {
         var iterations = new List<string>(){ "Iteration 1", "Iteration2", "Iteration3", "Iteration4" };
         _iterationsDropdown.AddOptions(iterations);
+        _attack.onClick.AddListener(OnAttack);
+        _heal.onClick.AddListener(OnHeal);
+        _createCharacter.onClick.AddListener(OnCreateCharacter);
+        _joinFactionBtn.onClick.AddListener(OnJoinFaction);
+        _leaveFactionBtn.onClick.AddListener(OnLeaveFaction);
     }
 
     private void Start()
     {
-        _presenter = new CharactersActionsPresenter(_characterViews.Select(view=> view.Character).ToList(), new Attack(), new Heal(), this);        
-        _attack.onClick.AddListener(OnAttack);
-        _heal.onClick.AddListener(OnHeal);
-        _createCharacter.onClick.AddListener(OnCreateCharacter);
+        //_presenter = new CharactersActionsPresenter(_characterViews.Select(view=> view.Character).ToList(), new Attack(), new Heal(), this);
+
+        _presenter = new CharactersActionsPresenter(_characterViews.Select(view => view.Character).ToList(), new Attack(), new Heal(), this);
+        OnChangeIteration(0);
     }
 
     public void UpdateCharactersView()
@@ -64,36 +71,45 @@ public class ActionsView : MonoBehaviour, IActionsView
     public void OnAttack()
     {
         Debug.LogFormat("Char {0} Attacking char {1}", GetActorName(), GetTargetName());
-        _presenter.Attack(GetActorName(), GetTargetName());
+        if(string.IsNullOrEmpty(_distance.text))
+            _presenter.Attack(GetActorName(), GetTargetName());
+        else
+            _presenter.Attack(GetActorName(), GetTargetName(), int.Parse(_distance.text));
     }
+    public void OnJoinFaction() {
+        Debug.LogFormat("Char {0} Join Faction {1}", GetActorName(), _faction.text);
+        _presenter.JoinFaction(GetActorName(), _faction.text);
+    }
+    public void OnLeaveFaction(){
 
+        Debug.LogFormat("Char {0} Leaves Faction {1}", GetActorName(), _faction.text);
+        _presenter.LeaveFaction(GetActorName(), _faction.text);
+    }
     public void OnCreateCharacter() {
         CharacterData characterData = new CharacterData(
             _characterName.text,
-            int.Parse(_characterLevel.text),
-            int.Parse(_characterHealth.text),
+            _characterLevel.text,
+            _characterHealth.text,
             _characterRanged.isOn
             );
-
         _presenter.CreateCharacter(characterData);
     }
     public void OnChangeIteration(int iteration) {
 
         CleanCharacterViews();
+        _distance.text = "";
         _distance.transform.parent.gameObject.SetActive(iteration > 1);
-        onChangeIteration?.Invoke(iteration);
-        if (iteration == 1) {
-            _presenter.CreateCharacter(new CharacterData("Player1", 7, 1000, true));
-            _presenter.CreateCharacter(new CharacterData("Player2", 1, 1000, true));
-           
-        }
-        else if (iteration == 2)
-        {
-            _presenter.CreateCharacter(new CharacterData("Ranged", 1, 1000, true));
-            _presenter.CreateCharacter(new CharacterData("Melee", 1, 1000, false));
-        }
-        
+        _faction.transform.parent.gameObject.SetActive(iteration > 2);
+        _joinFactionBtn.gameObject.SetActive(iteration > 2);
+        _leaveFactionBtn.gameObject.SetActive(iteration > 2);
 
+        onChangeIteration?.Invoke(iteration);
+
+        if (iteration < iterationData.Length)
+        {
+            foreach (var characterData in iterationData[iteration].characterDatas)
+                _presenter.CreateCharacter(characterData);
+        }
         _presenter = new CharactersActionsPresenter(_characterViews.Select(view => view.Character).ToList(), new Attack(), new Heal(), this);
     }
 
@@ -113,6 +129,7 @@ public class ActionsView : MonoBehaviour, IActionsView
         return _target.text;
     }
 
+    //interface
     public void OnCharacterCreated(Character character)
     {
         CharacterView characterUI = GameObject.Instantiate(_characterViewPrefab).GetComponent<CharacterView>();
@@ -120,18 +137,30 @@ public class ActionsView : MonoBehaviour, IActionsView
         _characterViews.Add(characterUI);
         characterUI.SetCharacter(character);
     }
+
+    public void UpdateCharacterView(Character character)
+    {
+        Debug.Log(character.FactionsToString());
+        _characterViews.Find(c => c.Character.Id == character.Id)?.UpdateView();
+    }
 }
+[System.Serializable]
 public struct CharacterData{
     public string name;
-    public int level;
-    public int health;
+    public string level;
+    public string health;
     public bool isRanged;
 
-    public CharacterData(string name, int level, int health, bool isRanged)
+    public CharacterData(string name, string level, string health, bool isRanged)
     {
         this.name = name;
         this.level = level;
         this.health = health;
         this.isRanged = isRanged;
     }
+}
+[System.Serializable]
+public class IterationData {
+    public List<CharacterData> characterDatas;
+
 }

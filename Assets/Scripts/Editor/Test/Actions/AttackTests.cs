@@ -79,6 +79,44 @@ namespace Editor.Test.Actions
             Assert.AreEqual(1000 - (int)(_actor.DamageAmount * 1.5f), _target.Health);
         }
 
+        [Test]
+        public void AttackIsNotReducedBy50PercentWhenTargetIsNot5LevelsAbove()
+        {
+            _target = new Character("Target", Character.MAX_HEALTH, 1);
+
+            _attack.Execute(_actor, _target);
+            Assert.AreEqual(1000 - _actor.DamageAmount, _target.Health);
+        }
+        [Test]
+        public void AttackIsNotIncreasedBy50PercentWhenTargetIsNot5LevelsBelow()
+        {
+            _actor = new Character("Actor", Character.MAX_HEALTH, 1);
+            _target = new Character("Target", Character.MAX_HEALTH, 1);
+
+            _attack.Execute(_actor, _target);
+            Assert.AreEqual(1000 - _actor.DamageAmount, _target.Health);
+        }
+
+        //Iteration 3
+        [Test]
+        public void AttackInRange()
+        {
+            _actor = new MeleeFighter("Actor");
+            _target = new Character("Target");
+
+            _attack.Execute(_actor, _target, 1);
+            Assert.AreEqual(Character.MAX_HEALTH - _actor.DamageAmount, _target.Health);
+        }
+        [Test]
+        public void AttackOutsideRange()
+        {
+            _actor = new RangeFighter("Actor");
+            _target = new Character("Target");
+
+            _attack.Execute(_actor, _target, 30);
+            Assert.AreEqual(Character.MAX_HEALTH, _target.Health);
+        }
+
         //Iteration4
 
         [Test]

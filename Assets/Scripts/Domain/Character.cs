@@ -7,6 +7,7 @@ namespace com.rpg.domain
     public class Character
     {
         public const int MAX_HEALTH = 1000;
+        public const int MIN_LVL = 1;
         public string Id { get; }
         public int Health { get; set; }
         public int Level { get; private set; }
@@ -22,7 +23,7 @@ namespace com.rpg.domain
 
         public Character(string id, int health = MAX_HEALTH, int level = 1)
         {
-            Id = id;
+            Id =  string.IsNullOrEmpty(id) ? $"Default { UnityEngine.Random.Range(0,1000)}" :  id;
             Health = health;
             Level = level;
             Alive = true;
@@ -37,20 +38,26 @@ namespace com.rpg.domain
 
         public bool InFaction(string faction) => Factions.Exists(x => x.Equals(faction));
 
-        public void JoinFaction(string faction)  =>  Factions.Add(faction);
+        public void JoinFaction(string faction)
+        {
+            if (!Factions.Contains(faction))
+                Factions.Add(faction);
+        }
 
         public void LeavesFaction(string faction) => Factions.Remove(faction);
 
         public bool IsAlly(Character other) => Factions.Exists(x => other.Factions.Contains(x));
 
         public string FactionsToString() {
-            string factionsValue = "None";
-            if(Factions.Count > 0)
-            { 
+
+            if (Factions.Count > 0)
+            {
+                string factionsValue = "";
                 Factions.ForEach(x => factionsValue += $"{x} -");
-                factionsValue.Remove(factionsValue.Length - 1);
+                return factionsValue.Remove(factionsValue.Length - 1);
             }
-            return factionsValue;
+            else
+                return "None";
         }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Actions;
 using com.rpg.domain;
@@ -22,11 +23,17 @@ namespace Presenter
         }
       
 
+        //Sobrecargado por iteracion 3 lo dejo por los test
         public void Attack(string actor, string target)
         {
+            Attack(actor, target, 0);
+        }
+        
+        public void Attack(string actor, string target, int distance)
+        { 
             var characterActor = GetCharacter(actor);
             var characterTarget = GetCharacter(target);
-            _attack.Execute(characterActor, characterTarget);
+            _attack.Execute(characterActor, characterTarget, distance);
             _view.UpdateCharactersView();
         }
 
@@ -39,16 +46,33 @@ namespace Presenter
         }
         public void CreateCharacter(CharacterData data) {
             Character character;
-            if (data.isRanged)
-                character = new RangeFighter(data.name, data.health, data.level);
-            else
-                character = new MeleeFighter(data.name, data.health, data.level);
+            int lvl = string.IsNullOrEmpty(data.level) ? Character.MIN_LVL : int.Parse(data.level);
+            int health = string.IsNullOrEmpty(data.health) ? Character.MAX_HEALTH : int.Parse(data.health);
 
+            if (data.isRanged)
+                character = new RangeFighter(data.name,  health, lvl);
+            else
+                character = new MeleeFighter(data.name, health, lvl);
+
+            _characters.Add(character);
             _view.OnCharacterCreated(character);
         }
-        private Character GetCharacter(string actor)
+        public Character GetCharacter(string actor)
         {
             return _characters.Find(c => c.Id == actor);
+        }
+
+        public void LeaveFaction(string actor, string faction)
+        {
+            Character character = GetCharacter(actor);
+            character.LeavesFaction(faction);
+            _view.UpdateCharacterView(character);
+        }
+        public void JoinFaction(string actor, string faction)
+        {
+            Character character = GetCharacter(actor);
+            character.JoinFaction(faction);
+            _view.UpdateCharacterView(character);
         }
     }
 }

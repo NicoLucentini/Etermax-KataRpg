@@ -79,6 +79,17 @@ namespace Editor.Test.Actions
             Assert.IsFalse(inFaction);
         }
         [Test]
+        public void CharacterCantDoubleJoinAFaction()
+        {
+            Character actor = new Character("Actor");
+            actor.JoinFaction("Orcs");
+            actor.JoinFaction("Orcs");
+
+            var factionCount = actor.Factions.Count;
+
+            Assert.AreEqual(1, factionCount);
+        }
+        [Test]
         public void CharacterIsAllyWithOther() {
             Character actor = new Character("Actor");
             Character other = new Character("Other");

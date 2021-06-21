@@ -6,4 +6,5 @@ public interface IActionsView
     void OnHeal();
     void OnAttack();
     void OnCharacterCreated(Character character);
+    void UpdateCharacterView(Character character);
 }
